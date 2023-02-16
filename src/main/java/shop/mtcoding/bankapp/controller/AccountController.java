@@ -13,8 +13,8 @@ public class AccountController {
     @GetMapping({ "/", "/account" })
     public String main() {
 
-        throw new CustomException("인증되지 않았습니다", HttpStatus.UNAUTHORIZED);
-        // return "account/main";
+        // throw new CustomException("인증되지 않았습니다", HttpStatus.UNAUTHORIZED);
+        return "account/main";
     }
 
     @GetMapping("/account/{id}")
