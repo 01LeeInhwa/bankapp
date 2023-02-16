@@ -1,14 +1,48 @@
 package shop.mtcoding.bankapp.controller;
 
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
+import shop.mtcoding.bankapp.dto.account.AccountSaveReqDto;
 import shop.mtcoding.bankapp.handler.ex.CustomException;
+import shop.mtcoding.bankapp.model.user.User;
+import shop.mtcoding.bankapp.service.AccountService;
 
 @Controller
 public class AccountController {
+
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    HttpSession session;
+
+    @PostMapping("/account")
+    public String save(AccountSaveReqDto accountSaveReqDto) {
+        // 인증
+        User principal = (User) session.getAttribute("principal");
+        if (principal == null) {
+            throw new CustomException("로그인을 먼저 해주세요", HttpStatus.BAD_REQUEST);
+        }
+
+        // 유효성 검사
+        if (accountSaveReqDto.getNumber() == null || accountSaveReqDto.getNumber().isEmpty()) {
+            throw new CustomException("username을 입력해주세요", HttpStatus.BAD_REQUEST);
+        }
+        if (accountSaveReqDto.getPassword() == null || accountSaveReqDto.getPassword().isEmpty()) {
+            throw new CustomException("password를 입력해주세요", HttpStatus.BAD_REQUEST);
+        }
+
+        // 서비스에 계좌생성() 호출
+        accountService.계좌생성(accountSaveReqDto, principal.getId());
+        return "redirect:/";
+    }
 
     @GetMapping({ "/", "/account" })
     public String main() {
